@@ -1,6 +1,19 @@
-// frontend/src/services/api.ts
+// frontend/src/services/api.ts - ПОВНА ВЕРСІЯ V2
 
-import { Game, Order, AuthResponse, LoginCredentials, RegisterCredentials } from '../types';
+import {
+  Game,
+  Order,
+  AuthResponse,
+  LoginCredentials,
+  RegisterCredentials,
+  Library,
+  LibraryGame,
+  Review,
+  CreateReviewRequest,
+  WishlistItem,
+  ShoppingCart,
+  CartItem,
+} from '../types';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
@@ -142,5 +155,210 @@ export const orderService = {
     }
     
     return response.json();
+  },
+};
+
+// Cart Service
+export const cartService = {
+  getCart: async (): Promise<ShoppingCart> => {
+    const response = await fetch(`${API_URL}/cart`, {
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch cart');
+    }
+    
+    return response.json();
+  },
+
+  addToCart: async (gameId: string): Promise<CartItem> => {
+    const response = await fetch(`${API_URL}/cart/items`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ gameId }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to add to cart');
+    }
+    
+    return response.json();
+  },
+
+  removeFromCart: async (itemId: string): Promise<void> => {
+    const response = await fetch(`${API_URL}/cart/items/${itemId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to remove from cart');
+    }
+  },
+
+  clearCart: async (): Promise<void> => {
+    const response = await fetch(`${API_URL}/cart`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to clear cart');
+    }
+  },
+};
+
+// Library Service
+export const libraryService = {
+  getLibrary: async (): Promise<Library> => {
+    const response = await fetch(`${API_URL}/library`, {
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch library');
+    }
+    
+    return response.json();
+  },
+
+  toggleInstall: async (gameId: string): Promise<LibraryGame> => {
+    const response = await fetch(`${API_URL}/library/games/${gameId}/install`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to toggle install');
+    }
+    
+    return response.json();
+  },
+
+  updatePlayTime: async (gameId: string, playTime: number): Promise<LibraryGame> => {
+    const response = await fetch(`${API_URL}/library/games/${gameId}/play`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ playTime }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to update play time');
+    }
+    
+    return response.json();
+  },
+};
+
+// Review Service
+export const reviewService = {
+  getGameReviews: async (gameId: string): Promise<Review[]> => {
+    const response = await fetch(`${API_URL}/reviews/game/${gameId}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch reviews');
+    }
+    
+    return response.json();
+  },
+
+  createReview: async (data: CreateReviewRequest): Promise<Review> => {
+    const response = await fetch(`${API_URL}/reviews`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create review');
+    }
+    
+    return response.json();
+  },
+
+  updateReview: async (
+    reviewId: string,
+    data: { rating?: number; comment?: string }
+  ): Promise<Review> => {
+    const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update review');
+    }
+    
+    return response.json();
+  },
+
+  deleteReview: async (reviewId: string): Promise<void> => {
+    const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to delete review');
+    }
+  },
+
+  markHelpful: async (reviewId: string): Promise<Review> => {
+    const response = await fetch(`${API_URL}/reviews/${reviewId}/helpful`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to mark review as helpful');
+    }
+    
+    return response.json();
+  },
+};
+
+// Wishlist Service
+export const wishlistService = {
+  getWishlist: async (): Promise<WishlistItem[]> => {
+    const response = await fetch(`${API_URL}/wishlist`, {
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch wishlist');
+    }
+    
+    return response.json();
+  },
+
+  addToWishlist: async (gameId: string): Promise<WishlistItem> => {
+    const response = await fetch(`${API_URL}/wishlist`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ gameId }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to add to wishlist');
+    }
+    
+    return response.json();
+  },
+
+  removeFromWishlist: async (gameId: string): Promise<void> => {
+    const response = await fetch(`${API_URL}/wishlist/${gameId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to remove from wishlist');
+    }
   },
 };
