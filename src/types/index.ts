@@ -1,5 +1,3 @@
-// frontend/src/types/index.ts - ОНОВЛЕНА ВЕРСІЯ
-
 // Enums
 export enum AccountStatus {
   ACTIVE = 'ACTIVE',
@@ -45,11 +43,12 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  registrationDate: string;
-  lastLoginDate?: string;
-  accountStatus: AccountStatus;
-  balance: number;
-  userType: 'CUSTOMER' | 'ADMIN';
+  role: 'USER' | 'ADMIN'; // Для сумісності зі старою версією
+  registrationDate?: string;
+  lastLoginAt?: string;
+  accountStatus?: AccountStatus;
+  balance?: number;
+  userType?: 'CUSTOMER' | 'ADMIN';
   
   // Customer fields
   customerLevel?: string;
@@ -89,6 +88,7 @@ export interface Game {
   rating: number;
   downloadSize: number;
   coverImage: string;
+  coverImageUrl?: string;
   screenshots: string[];
   videoTrailer?: string;
   ageRating: string;

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { SystemRequirements as SystemReq } from '../types';
-import { Monitor, Cpu, HardDrive, MemoryStick, Gpu } from 'lucide-react';
+import { Monitor, Cpu, HardDrive, MemoryStick, CpuIcon } from 'lucide-react';
 
 interface SystemRequirementsProps {
   requirements: SystemReq;
@@ -76,7 +76,7 @@ const SystemRequirements: React.FC<SystemRequirementsProps> = ({ requirements })
           <SpecItem icon={Cpu} label="Processor" value={specs.processor} />
           <SpecItem icon={MemoryStick} label="Memory (RAM)" value={specs.ram} />
           <SpecItem icon={HardDrive} label="Storage" value={specs.storage} />
-          <SpecItem icon={Gpu} label="Graphics Card" value={specs.graphics} />
+          <SpecItem icon={CpuIcon} label="Graphics Card" value={specs.graphics} />
         </div>
 
         <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">

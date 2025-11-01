@@ -1,10 +1,15 @@
 // frontend/src/context/CartContext.tsx
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Game, CartItem } from '../types';
+import { Game } from '../types';
+
+// Простий тип для локального кошика (frontend state)
+interface LocalCartItem {
+  game: Game;
+}
 
 interface CartContextType {
-  items: CartItem[];
+  items: LocalCartItem[];
   addToCart: (game: Game) => void;
   removeFromCart: (gameId: string) => void;
   clearCart: () => void;
@@ -20,7 +25,7 @@ interface CartProviderProps {
 }
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<LocalCartItem[]>([]);
 
   const addToCart = (game: Game): void => {
     setItems((prevItems) => {

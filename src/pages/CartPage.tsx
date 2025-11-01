@@ -76,16 +76,18 @@ const CartPage: React.FC = () => {
               className="bg-white rounded-lg shadow-md p-4 flex gap-4"
             >
               <img
-                src={item.game.coverImageUrl}
+                src={item.game.coverImage || item.game.coverImageUrl}
                 alt={item.game.title}
                 className="w-24 h-24 object-cover rounded"
               />
               
               <div className="flex-1">
                 <h3 className="text-xl font-bold mb-1">{item.game.title}</h3>
-                <p className="text-gray-600 text-sm mb-2">{item.game.genre.name}</p>
+                <p className="text-gray-600 text-sm mb-2">
+                  {typeof item.game.genre === 'string' ? item.game.genre : item.game.genre}
+                </p>
                 <p className="text-lg font-semibold text-blue-600">
-                  ${item.game.price.toFixed(2)}
+                  ${item.game.price}
                 </p>
               </div>
 

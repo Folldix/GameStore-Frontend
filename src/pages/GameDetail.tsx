@@ -260,10 +260,10 @@ const GameDetailPage: React.FC = () => {
                     </span>
                     <div>
                       <div className="text-gray-400 line-through text-lg">
-                        ${game.price.toFixed(2)}
+                        ${game.price}
                       </div>
                       <div className="text-4xl font-bold text-green-400">
-                        ${finalPrice.toFixed(2)}
+                        ${finalPrice}
                       </div>
                     </div>
                   </div>

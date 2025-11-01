@@ -61,12 +61,12 @@ const ProfilePage: React.FC = () => {
                 <span className="font-semibold">Role:</span>{' '}
                 <span
                   className={`inline-block px-2 py-1 rounded text-sm ${
-                    user.role === 'ADMIN'
+                    user.role === 'ADMIN' || user.userType === 'ADMIN'
                       ? 'bg-purple-100 text-purple-800'
                       : 'bg-blue-100 text-blue-800'
                   }`}
                 >
-                  {user.role}
+                  {user.role || user.userType || 'USER'}
                 </span>
               </p>
             </div>
@@ -115,7 +115,7 @@ const ProfilePage: React.FC = () => {
                       </p>
                       <p className="text-sm text-gray-600">
                         Date:{' '}
-                        {new Date(order.purchaseDate).toLocaleDateString('en-US', {
+                        {new Date(order.orderDate).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric',
@@ -133,7 +133,7 @@ const ProfilePage: React.FC = () => {
 
                   <div className="space-y-2">
                     <p className="font-semibold text-gray-700">Items:</p>
-                    {order.orderItems.map((item) => (
+                    {order.items.map((item) => (
                       <div
                         key={item.id}
                         className="flex items-center gap-3 bg-gray-50 p-3 rounded"
@@ -145,11 +145,11 @@ const ProfilePage: React.FC = () => {
                         />
                         <div className="flex-1">
                           <p className="font-semibold">{item.game.title}</p>
-                          <p className="text-sm text-gray-600">{item.game.genre.name}</p>
+                          <p className="text-sm text-gray-600">{item.game.genre}</p>
                         </div>
                         <div className="text-right">
                           <p className="font-semibold text-blue-600">
-                            ${item.priceAtPurchase.toFixed(2)}
+                            ${item.price.toFixed(2)}
                           </p>
                         </div>
                       </div>

@@ -36,7 +36,9 @@ const StorePage: React.FC = () => {
   };
 
   // Extract unique genres from games
-  const genres = Array.from(new Set(games.map(game => game.genre.name)));
+  const genres = Array.from(new Set(games.map(game => 
+    typeof game.genre === 'string' ? game.genre : game.genre
+  )));
 
   if (loading) {
     return (
@@ -109,7 +111,7 @@ const StorePage: React.FC = () => {
               <div className="p-4">
                 <h2 className="text-xl font-bold mb-2 truncate">{game.title}</h2>
                 
-                <p className="text-gray-600 text-sm mb-2">{game.genre.name}</p>
+                <p className="text-gray-600 text-sm mb-2">{game.genre}</p>
                 
                 <p className="text-gray-700 text-sm mb-4 line-clamp-2">
                   {game.description}
@@ -117,7 +119,7 @@ const StorePage: React.FC = () => {
                 
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-2xl font-bold text-blue-600">
-                    ${game.price.toFixed(2)}
+                    ${game.price}
                   </span>
                 </div>
                 
