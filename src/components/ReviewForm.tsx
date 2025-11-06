@@ -76,7 +76,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ gameId, onReviewSubmitted }) =>
                 onClick={() => setRating(star)}
                 onMouseEnter={() => setHoverRating(star)}
                 onMouseLeave={() => setHoverRating(0)}
-                className="focus:outline-none transition-transform hover:scale-110"
+                className="btn btn-primary btn-glow"
               >
                 <Star
                   className={`w-8 h-8 ${
@@ -123,7 +123,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ gameId, onReviewSubmitted }) =>
         <button
           type="submit"
           disabled={loading || rating === 0 || comment.length < 10}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="btn btn-primary btn-glow disabled:btn-disabled"
         >
           {loading ? 'Submitting...' : 'Submit Review'}
         </button>

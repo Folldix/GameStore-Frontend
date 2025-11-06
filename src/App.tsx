@@ -1,6 +1,6 @@
 // frontend/src/App.tsx - ОНОВЛЕНА ВЕРСІЯ
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -70,7 +70,26 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  
+const [scrollProgress, setScrollProgress] = useState(0);
+
+useEffect(() => {
+  const handleScroll = () => {
+    const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = (window.scrollY / totalHeight) * 100;
+    setScrollProgress(progress);
+  };
+  
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
+
   return (
+    <>
+    <div 
+      className="scroll-progress" 
+      style={{ width: `${scrollProgress}%` }}
+    />
     <Router>
       <AuthProvider>
         <CartProvider>
@@ -78,6 +97,7 @@ const App: React.FC = () => {
         </CartProvider>
       </AuthProvider>
     </Router>
+    </>
   );
 };
 

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Game } from '../types';
 import { gameService } from '../services/api';
 import { useCart } from '../context/CartContext';
+import { Star, ShoppingCart } from 'lucide-react';
 
 const StorePage: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
@@ -42,9 +43,9 @@ const StorePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="mx-auto px-4 py-8 page-transition" style={{ maxWidth: '1400px' }}>
         <div className="text-center">
-          <div className="text-xl">Loading games...</div>
+          <div className="cyber-spinner"></div>
         </div>
       </div>
     );
@@ -52,7 +53,7 @@ const StorePage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="mx-auto px-4 py-8 page-transition" style={{ maxWidth: '1400px' }}>
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
@@ -67,27 +68,53 @@ const StorePage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8">Game Store</h1>
+    <div className="mx-auto px-4 py-8 page-transition">
+      <style>{`
+        .games-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.5rem;
+        }
+        
+        @media (max-width: 1024px) {
+          .games-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        
+        @media (max-width: 768px) {
+          .games-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-5xl font-bold mb-4 gradient-text">Game Store</h1>
+        <p className="text-gray-400 text-lg">
+          Discover and purchase the latest games
+        </p>
+      </div>
 
       {/* Genre Filter */}
-      <div className="mb-6">
-        <label htmlFor="genre" className="block text-gray-700 font-semibold mb-2">
-          Filter by Genre:
-        </label>
-        <select
-          id="genre"
-          value={selectedGenre}
-          onChange={(e) => setSelectedGenre(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">All Genres</option>
+      <div className="mb-8">
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => setSelectedGenre('')}
+            className={`category-chip ${selectedGenre === '' ? 'active' : ''}`}
+          >
+            All Genres
+          </button>
           {genres.map((genre) => (
-            <option key={genre} value={genre}>
+            <button
+              key={genre}
+              onClick={() => setSelectedGenre(genre)}
+              className={`category-chip ${selectedGenre === genre ? 'active' : ''}`}
+            >
               {genre}
-            </option>
+            </button>
           ))}
-        </select>
+        </div>
       </div>
 
       {/* Games Grid */}
@@ -96,37 +123,89 @@ const StorePage: React.FC = () => {
           <p className="text-xl">No games found</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(3, 1fr)', 
+          gap: '1.5rem' 
+        }}>
           {games.map((game) => (
-            <div
-              key={game.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-200"
-            >
-              <img
-                src={game.coverImageUrl}
-                alt={game.title}
-                className="w-full h-64 object-cover"
-              />
+            <div key={game.id} className="game-card-cyber glass-card hover-lift rounded-lg overflow-hidden">
+              <div className="image-zoom rounded-lg overflow-hidden">
+                <img
+                  src={game.coverImageUrl}
+                  alt={game.title}
+                  loading="lazy"
+                />
+              </div>
               
-              <div className="p-4">
-                <h2 className="text-xl font-bold mb-2 truncate">{game.title}</h2>
+              {/* Discount Badge */}
+              {game.discountPrice && (
+                <div className="discount-badge-shine absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded-lg font-bold">
+                  -{Math.round((1 - game.discountPrice / game.price) * 100)}%
+                </div>
+              )}
+
+              <div className="p-5">
+                 {/* Title */}
+                <h2 className="text-xl font-bold mb-2 truncate text-white">
+                  {game.title}
+                </h2>
                 
-                <p className="text-gray-600 text-sm mb-2">{game.genre}</p>
+                {/* Genre Badge */}
+                <div className="mb-3">
+                  <span className="genre-tag text-xs">
+                    {game.genre}
+                  </span>
+                </div>
                 
-                <p className="text-gray-700 text-sm mb-4 line-clamp-2">
+                {/* Description */}
+                <p className="text-gray-400 text-sm mb-4 line-clamp-2">
                   {game.description}
                 </p>
                 
+                {/* Rating (if available) */}
+                {game.rating && (
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`w-4 h-4 ${
+                            star <= Math.round(game.rating)
+                              ? 'text-yellow-400 fill-yellow-400'
+                              : 'text-gray-600'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-400">
+                      {game.rating.toFixed(1)}
+                    </span>
+                  </div>
+                )}
+                
+                {/* Price */}
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl font-bold text-blue-600">
-                    ${game.price}
-                  </span>
+                  {game.discountPrice ? (
+                    <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-blue-600">                        
+                        {game.discountPrice}
+                      </span>
+                      <span className="text-gray-500 line-through text-sm">
+                        ${game.price}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-2xl font-bold text-blue-600">
+                      ${game.price}
+                    </span>
+                  )}
                 </div>
                 
                 <div className="flex gap-2">
                   <Link
                     to={`/game/${game.id}`}
-                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg text-center hover:bg-blue-700 transition duration-200"
+                    className="btn btn-primary flex-1 text-center"
                   >
                     View Details
                   </Link>
@@ -134,11 +213,7 @@ const StorePage: React.FC = () => {
                   <button
                     onClick={() => handleAddToCart(game)}
                     disabled={isInCart(game.id)}
-                    className={`px-4 py-2 rounded-lg transition duration-200 ${
-                      isInCart(game.id)
-                        ? 'bg-gray-400 text-white cursor-not-allowed'
-                        : 'bg-green-600 text-white hover:bg-green-700'
-                    }`}
+                    className={`btn ${isInCart(game.id) ? 'btn-disabled' : 'btn-success'}`}
                   >
                     {isInCart(game.id) ? 'In Cart' : 'Add'}
                   </button>

@@ -1,18 +1,18 @@
 // frontend/src/context/AuthContext.tsx
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User } from '../types';
-import { authService } from '../services/api';
+import { User, AuthResponse } from '../types';
+import { authService, isTokenValid } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
   login: (email: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
   loading: boolean;
+  checkAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,37 +23,38 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Load user and token from localStorage on mount
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    
-    if (storedToken && storedUser) {
+  const loadUserFromStorage = (): void => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
       try {
-        setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error('Failed to parse stored user:', error);
-        localStorage.removeItem('token');
+        setUser(JSON.parse(userData));
+      } catch (e) {
+        console.error('Error parsing user data:', e);
         localStorage.removeItem('user');
       }
     }
-    
     setLoading(false);
+  };
+
+  useEffect(() => {
+    if (isTokenValid()) {
+      loadUserFromStorage();
+    } else {
+      // Clear tokens if invalid
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setLoading(false);
+    }
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
     try {
-      const data = await authService.login({ email, password });
-      
-      setToken(data.token);
-      setUser(data.user);
-      
+      const data: AuthResponse = await authService.login({ email, password });
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
     } catch (error) {
       throw error;
     }
@@ -61,34 +62,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (username: string, email: string, password: string): Promise<void> => {
     try {
-      const data = await authService.register({ username, email, password });
-      
-      setToken(data.token);
-      setUser(data.user);
-      
+      const data: AuthResponse = await authService.register({ username, email, password });
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
     } catch (error) {
       throw error;
     }
   };
 
   const logout = (): void => {
-    setToken(null);
-    setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    setUser(null);
+    // Optional: call logout API for session invalidation
+  };
+
+  const checkAuth = async (): Promise<void> => {
+    if (isTokenValid() && !user) {
+      loadUserFromStorage();
+    }
   };
 
   const value: AuthContextType = {
     user,
-    token,
     login,
     register,
     logout,
-    isAuthenticated: !!token && !!user,
+    isAuthenticated: isTokenValid(),
     isAdmin: user?.role === 'ADMIN',
     loading,
+    checkAuth,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

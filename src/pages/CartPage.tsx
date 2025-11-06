@@ -48,7 +48,7 @@ const CartPage: React.FC = () => {
           <p className="text-xl text-gray-600 mb-6">Your cart is empty</p>
           <button
             onClick={() => navigate('/')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200"
+            className="btn btn-glow btn-primary"
           >
             Browse Games
           </button>
@@ -73,7 +73,7 @@ const CartPage: React.FC = () => {
           {items.map((item) => (
             <div
               key={item.game.id}
-              className="bg-white rounded-lg shadow-md p-4 flex gap-4"
+              className="glass-card hover-lift mb-4"
             >
               <img
                 src={item.game.coverImage || item.game.coverImageUrl}
@@ -94,7 +94,7 @@ const CartPage: React.FC = () => {
               <div className="flex items-center">
                 <button
                   onClick={() => removeFromCart(item.game.id)}
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-200"
+                  className="btn btn-danger flex-1 text-center"
                 >
                   Remove
                 </button>
@@ -105,19 +105,19 @@ const CartPage: React.FC = () => {
 
         {/* Order Summary */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
+          <div className="glass-card hover-lift mb-4">
             <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
             
             <div className="space-y-2 mb-4">
               <div className="flex justify-between text-gray-600">
                 <span>Items ({items.length})</span>
-                <span>${total.toFixed(2)}</span>
+                <span>${total}</span>
               </div>
               
               <div className="border-t pt-2 mt-2">
                 <div className="flex justify-between text-xl font-bold">
                   <span>Total</span>
-                  <span className="text-blue-600">${total.toFixed(2)}</span>
+                  <span className="text-blue-600">${total}</span>
                 </div>
               </div>
             </div>
@@ -125,7 +125,7 @@ const CartPage: React.FC = () => {
             <button
               onClick={handleCheckout}
               disabled={loading}
-              className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition duration-200 disabled:bg-gray-400"
+              className="btn btn-success text-center btn-glow bg-green-600"
             >
               {loading ? 'Processing...' : 'Proceed to Checkout'}
             </button>
@@ -138,7 +138,7 @@ const CartPage: React.FC = () => {
 
             <button
               onClick={() => navigate('/')}
-              className="w-full mt-3 bg-gray-200 text-gray-700 py-2 px-6 rounded-lg font-semibold hover:bg-gray-300 transition duration-200"
+              className="btn btn-primary btn-glow"
             >
               Continue Shopping
             </button>

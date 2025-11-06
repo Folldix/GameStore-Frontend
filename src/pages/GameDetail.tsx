@@ -142,13 +142,13 @@ const GameDetailPage: React.FC = () => {
   const finalPrice = game.discountPrice || game.price;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="glass-card p-6">
       {/* Hero Section */}
       <div className="bg-gradient-to-b from-gray-900 to-gray-800 text-white">
         <div className="container mx-auto px-4 py-8">
           <button
             onClick={() => navigate('/')}
-            className="mb-6 text-blue-400 hover:underline flex items-center"
+            className="btn btn-primary btn-glow"
           >
             ← Back to Store
           </button>
@@ -199,7 +199,7 @@ const GameDetailPage: React.FC = () => {
                 <button
                   onClick={handleToggleWishlist}
                   disabled={wishlistLoading}
-                  className="p-2 rounded-full hover:bg-white/10 transition"
+                  className="btn btn-danger btn-glow"
                   title={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
                 >
                   <Heart
@@ -268,7 +268,7 @@ const GameDetailPage: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="text-4xl font-bold">${finalPrice.toFixed(2)}</div>
+                  <div className="text-4xl font-bold">${finalPrice}</div>
                 )}
               </div>
 
@@ -279,8 +279,8 @@ const GameDetailPage: React.FC = () => {
                   disabled={isInCart(game.id)}
                   className={`flex-1 py-4 px-6 rounded-lg text-lg font-semibold transition duration-200 ${
                     isInCart(game.id)
-                      ? 'bg-gray-600 cursor-not-allowed'
-                      : 'bg-green-600 hover:bg-green-700'
+                      ? 'btn btn-disabled'
+                      : 'btn btn-success text-center btn-glow bg-green-600'
                   }`}
                 >
                   {isInCart(game.id) ? 'Already in Cart' : 'Add to Cart'}
@@ -289,7 +289,7 @@ const GameDetailPage: React.FC = () => {
                 {isInCart(game.id) && (
                   <button
                     onClick={() => navigate('/cart')}
-                    className="py-4 px-6 rounded-lg text-lg font-semibold bg-blue-600 hover:bg-blue-700 transition duration-200"
+                    className="btn btn-primary"
                   >
                     Go to Cart
                   </button>
