@@ -15,8 +15,7 @@
 }
 
 .hover-lift:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 217, 255, 0.2);
+  box-shadow: 0 -4px 10px 10px rgba(0, 217, 255, 0.2);
 }
 
 /* Neon Border Animation */
@@ -60,7 +59,7 @@
 
 /* Gradient Text */
 .gradient-text {
-  background: linear-gradient(135deg, #00d9ff 0%, #7b2cbf 100%);
+  background: linear-gradient(135deg, #2E9BFA 0%, #5ff3c9 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -71,6 +70,7 @@
   position: relative;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
 }
 
 .game-card-cyber::before {
@@ -91,10 +91,10 @@
   opacity: 0;
 }
 
-.game-card-cyber:hover::before {
+/* .game-card-cyber:hover::before {
   opacity: 1;
   animation: scan 2s linear infinite;
-}
+} */
 
 @keyframes scan {
   0% {
@@ -108,12 +108,12 @@
 /* Button Glow Effect */
 .btn-glow {
   position: relative;
-  box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 89, 255, 0.3);
   transition: all 0.3s ease;
 }
 
 .btn-glow:hover {
-  box-shadow: 0 0 40px rgba(0, 217, 255, 0.6);
+  box-shadow: 0 0 40px rgba(0, 98, 255, 0.6);
   transform: translateY(-2px);
 }
 
@@ -135,7 +135,7 @@
 .cyber-spinner {
   width: 50px;
   height: 50px;
-  border: 3px solid rgba(0, 217, 255, 0.2);
+  border: 3px solid rgba(0, 81, 255, 0.2);
   border-top-color: #00d9ff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -258,7 +258,7 @@
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #00d9ff;
+  color: #00ccff;
   transition: all 0.3s ease;
   cursor: pointer;
 }
@@ -266,13 +266,13 @@
 .category-chip:hover {
   background: rgba(102, 126, 234, 0.25);
   border-color: #00d9ff;
-  box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 136, 255, 0.3);
 }
 
 .category-chip.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2E9BFA, #5fccf3);
   border-color: transparent;
-  color: white;
+  color: #1a202c;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 

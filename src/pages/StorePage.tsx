@@ -89,15 +89,12 @@ const StorePage: React.FC = () => {
         }
       `}</style>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-5xl font-bold mb-4 gradient-text">Game Store</h1>
-        <p className="text-gray-400 text-lg">
-          Discover and purchase the latest games
-        </p>
+      <div className="mb-8" style={{margin: 10}}>
+        <h1 className="text-3xl font-bold mb-4 gradient-text">Discover and purchase the latest games</h1>
       </div>
 
       {/* Genre Filter */}
-      <div className="mb-8">
+      <div className="mb-8" style={{margin: 10}}>
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => setSelectedGenre('')}
@@ -110,6 +107,7 @@ const StorePage: React.FC = () => {
               key={genre}
               onClick={() => setSelectedGenre(genre)}
               className={`category-chip ${selectedGenre === genre ? 'active' : ''}`}
+              style={{  marginLeft: 5}}
             >
               {genre}
             </button>
@@ -119,7 +117,7 @@ const StorePage: React.FC = () => {
 
       {/* Games Grid */}
       {games.length === 0 ? (
-        <div className="text-center text-gray-600 py-12">
+        <div className="text-center text-gray-600 py-12" style={{margin: 10}}>
           <p className="text-xl">No games found</p>
         </div>
       ) : (
@@ -129,7 +127,7 @@ const StorePage: React.FC = () => {
           gap: '1.5rem' 
         }}>
           {games.map((game) => (
-            <div key={game.id} className="game-card-cyber glass-card hover-lift rounded-lg overflow-hidden">
+            <div key={game.id} className="game-card-cyber glass-card hover-lift rounded-lg overflow-hidden" style={{margin: 10}}>
               <div className="image-zoom rounded-lg overflow-hidden">
                 <img
                   src={game.coverImageUrl}
@@ -145,27 +143,27 @@ const StorePage: React.FC = () => {
                 </div>
               )}
 
-              <div className="p-5">
+              <div className="p-5" style={{  margin: 20}}>
                  {/* Title */}
-                <h2 className="text-xl font-bold mb-2 truncate text-white">
+                <h2 className="text-xl font-bold mb-2 truncate text-white" style={{  padding: 5}}>
                   {game.title}
                 </h2>
                 
                 {/* Genre Badge */}
-                <div className="mb-3">
+                <div className="mb-3" style={{  padding: 5}}>
                   <span className="genre-tag text-xs">
                     {game.genre}
                   </span>
                 </div>
                 
                 {/* Description */}
-                <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+                <p className="text-gray-400 text-sm mb-4 line-clamp-2 pd-5" style={{  padding: 5}}>
                   {game.description}
                 </p>
                 
                 {/* Rating (if available) */}
                 {game.rating && (
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-2 mb-3" style={{  padding: 5}}>
                     <div className="flex">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
@@ -185,13 +183,13 @@ const StorePage: React.FC = () => {
                 )}
                 
                 {/* Price */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4" style={{  padding: 5}}>
                   {game.discountPrice ? (
                     <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold text-blue-600">                        
-                        {game.discountPrice}
+                        ${game.discountPrice}
                       </span>
-                      <span className="text-gray-500 line-through text-sm">
+                      <span className="text-gray-500 line-through text-sm" style={{ paddingLeft: 10}}>
                         ${game.price}
                       </span>
                     </div>
@@ -202,7 +200,7 @@ const StorePage: React.FC = () => {
                   )}
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex gap-2" style={{  padding: 5}}>
                   <Link
                     to={`/game/${game.id}`}
                     className="btn btn-primary flex-1 text-center"
@@ -214,6 +212,7 @@ const StorePage: React.FC = () => {
                     onClick={() => handleAddToCart(game)}
                     disabled={isInCart(game.id)}
                     className={`btn ${isInCart(game.id) ? 'btn-disabled' : 'btn-success'}`}
+                    style={{  float: 'right', marginRight: 20, marginBottom: 20}}
                   >
                     {isInCart(game.id) ? 'In Cart' : 'Add'}
                   </button>
