@@ -205,7 +205,7 @@ const StorePage: React.FC = () => {
                 <div className="flex gap-2" style={{  padding: 5}}>
                   <Link
                     to={`/game/${game.id}`}
-                    className="btn btn-primary flex-1 text-center"
+                    className="btn btn-primary flex-1"
                   >
                     View Details
                   </Link>

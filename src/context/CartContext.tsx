@@ -51,7 +51,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const itemCount = items.length;
 
-  const total = items.reduce((sum, item) => sum + item.game.price, 0);
+  const total = items.reduce((sum, item) => sum + Number(item.game.price), 0);
 
   const value: CartContextType = {
     items,

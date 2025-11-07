@@ -590,6 +590,17 @@ nav {
   transition: all 0.3s ease;
 }
 
+.text-center { 
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  /* height: 80vh; */
+}
+.items-center{
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 /* Code Blocks */
 code {
   font-family: 'JetBrains Mono', 'Courier New', monospace;

@@ -280,7 +280,7 @@ const GameDetailPage: React.FC = () => {
                   className={`flex-1 py-4 px-6 rounded-lg text-lg font-semibold transition duration-200 ${
                     isInCart(game.id)
                       ? 'btn btn-disabled'
-                      : 'btn btn-success text-center btn-glow bg-green-600'
+                      : 'btn btn-success btn-glow bg-green-600'
                   }`}
                 >
                   {isInCart(game.id) ? 'Already in Cart' : 'Add to Cart'}
