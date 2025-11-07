@@ -128,11 +128,13 @@ const StorePage: React.FC = () => {
         }}>
           {games.map((game) => (
             <div key={game.id} className="game-card-cyber glass-card hover-lift rounded-lg overflow-hidden" style={{margin: 10}}>
-              <div className="image-zoom rounded-lg overflow-hidden">
+              <div className="image-zoom rounded-lg overflow-hidden" style={{ height: '280px', overflow: 'hidden' }}>
                 <img
-                  src={game.coverImageUrl}
+                  src={game.coverImage}
                   alt={game.title}
                   loading="lazy"
+                  className="w-full h-full object-cover object-top"
+                  style={{ minHeight: '100%', minWidth: '100%' }}
                 />
               </div>
               

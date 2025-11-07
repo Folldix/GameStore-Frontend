@@ -279,10 +279,6 @@ button:hover::before, .btn:hover::before {
   cursor: not-allowed;
 }
 
-.bg-red-600:hover {
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
-  transform: translateY(-2px);
-}
 .bg-green-600:hover {
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
   transform: translateY(-2px);
