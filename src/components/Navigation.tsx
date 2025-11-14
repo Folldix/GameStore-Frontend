@@ -132,11 +132,6 @@ const LoginButton = styled(StyledButton)`
   color: white;
 `;
 
-const RegisterButton = styled(StyledButton)`
-  background: linear-gradient(to right, #ffe066, #ffd43b);
-  color: #343a40;
-`;
-
 const LogoutButton = styled(StyledButton)`
   background: linear-gradient(to right, #e03131, #fa5252);
   color: white;
@@ -203,9 +198,6 @@ const Navigation: React.FC = () => {
                 <LoginButton as={Link} to="/login">
                   LOGIN
                 </LoginButton>
-                <RegisterButton as={Link} to="/register">
-                  REGISTER
-                </RegisterButton>
               </>
             )}
           </ButtonsContainer>

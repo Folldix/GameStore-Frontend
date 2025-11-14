@@ -1,5 +1,3 @@
-// frontend/src/pages/RegisterPage.tsx
-
 import React, { useState, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -50,7 +48,86 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100" style={{ marginTop: '50vh', display: 'flex', position: 'relative', zIndex: 10 }}>
+            <style>{`
+        .login-form-container {
+          width: 100%;
+          max-width: 480px;
+        }
+        
+        .input-group {
+          position: relative;
+          margin-bottom: 1.5rem;
+        }
+        
+        .input-icon {
+          position: absolute;
+          left: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #718096;
+          pointer-events: none;
+        }
+        
+        .input-with-icon {
+          padding-left: 3rem;
+        }
+        
+        .input-field {
+          width: 100%;
+          padding: 0.875rem 1rem;
+          background: rgba(26, 31, 58, 0.6);
+          border: 2px solid rgba(102, 126, 234, 0.2);
+          border-radius: 12px;
+          color: #ffffff;
+          font-size: 1rem;
+          transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+          outline: none;
+          border-color: #00d9ff;
+          background: rgba(26, 31, 58, 0.8);
+          box-shadow: 0 0 0 4px rgba(0, 217, 255, 0.1), 0 0 20px rgba(0, 217, 255, 0.2);
+        }
+        
+        .input-field::placeholder {
+          color: #718096;
+        }
+        
+        .login-button {
+          width: 100%;
+          padding: 1rem;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border: none;
+          border-radius: 12px;
+          color: white;
+          font-size: 1.125rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .login-button:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 30px rgba(102, 126, 234, 0.6);
+        }
+        
+        .login-button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        
+        .logo-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          margin-bottom: 2rem;
+        }
+      `}</style>
+
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <h2 className="text-3xl font-bold text-center mb-6">Register</h2>
         
