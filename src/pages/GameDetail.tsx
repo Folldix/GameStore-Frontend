@@ -1,4 +1,4 @@
-// frontend/src/pages/GameDetailPage.tsx - ОНОВЛЕНА ВЕРСІЯ
+// frontend/src/pages/GameDetailPage.tsx - ПЕРЕРОБЛЕНА ВЕРСІЯ
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -6,8 +6,8 @@ import { Game, Review } from '../types';
 import { gameService, reviewService, wishlistService } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Heart, Star, Calendar, Download } from 'lucide-react';
-import SystemRequirements from '../components/SystemRequirements';
+import { useLibrary } from '../context/LibraryContext';
+import { Heart, Star, Calendar, Download, Monitor, Cpu, HardDrive, MemoryStick, CpuIcon } from 'lucide-react';
 import ReviewsList from '../components/ReviewsList';
 import ReviewForm from '../components/ReviewForm';
 
@@ -24,6 +24,7 @@ const GameDetailPage: React.FC = () => {
   
   const { addToCart, isInCart } = useCart();
   const { isAuthenticated } = useAuth();
+  const { isGameOwned } = useLibrary();
 
   useEffect(() => {
     if (id) {
@@ -68,6 +69,10 @@ const GameDetailPage: React.FC = () => {
 
   const handleAddToCart = () => {
     if (game) {
+      if (isGameOwned(game.id)) {
+        alert('Ви вже маєте цю гру в бібліотеці!');
+        return;
+      }
       addToCart(game);
       setShowAddedMessage(true);
       setTimeout(() => setShowAddedMessage(false), 3000);
@@ -81,6 +86,11 @@ const GameDetailPage: React.FC = () => {
     }
 
     if (!game) return;
+
+    if (isGameOwned(game.id)) {
+      alert('Ви вже маєте цю гру в бібліотеці!');
+      return;
+    }
 
     setWishlistLoading(true);
     try {
@@ -101,7 +111,7 @@ const GameDetailPage: React.FC = () => {
   const handleReviewSubmitted = () => {
     if (id) {
       loadReviews(id);
-      loadGame(id); // Reload to get updated rating
+      loadGame(id);
     }
   };
 
@@ -141,77 +151,99 @@ const GameDetailPage: React.FC = () => {
 
   const finalPrice = game.discountPrice || game.price;
 
+  // Збираємо всі зображення для горизонтального скролу
+  const allImages = [game.coverImage, ...(game.screenshots || [])].filter(Boolean);
+
+  const SpecItem = ({ icon: Icon, label, value }: { icon: any; label: string; value: string }) => (
+    <div className="p-3">
+      <div className="flex gap-3">
+        <div className="flex-shrink-0">
+          <Icon className="w-5 h-5 text-gray-600" />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-gray-600 mb-1">{label}</p>
+          <p className="text-gray-800 text-sm">{value}</p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="glass-card p-6">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-        <div className="container mx-auto px-4 py-8">
-          <button
-            onClick={() => navigate('/')}
-            className="btn btn-primary btn-glow"
-          >
-            ← Back to Store
-          </button>
+    <div className="container mx-auto px-4 py-8">
+      <style>{`
+        .screenshots-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(0, 217, 255, 0.8) rgba(26, 31, 58, 0.5);
+        }
+        .screenshots-scroll::-webkit-scrollbar {
+          height: 12px;
+        }
+        .screenshots-scroll::-webkit-scrollbar-track {
+          background: rgba(26, 31, 58, 0.5);
+          border-radius: 6px;
+        }
+        .screenshots-scroll::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #2E9BFA, #5ff3f3);
+          border-radius: 6px;
+          border: 2px solid rgba(26, 31, 58, 0.5);
+        }
+        .screenshots-scroll::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #00b8d9, #6a1fa8);
+        }
+      `}</style>
+      <button
+        onClick={() => navigate('/')}
+        className="mb-6 text-blue-600 hover:text-blue-800"
+      >
+        ← Back to Store
+      </button>
 
-          {showAddedMessage && (
-            <div className="mb-4 bg-green-600 text-white px-4 py-3 rounded-lg">
-              Game added to cart!
+      {showAddedMessage && (
+        <div className="mb-4 bg-green-600 text-white px-4 py-3 rounded-lg">
+          Game added to cart!
+        </div>
+      )}
+
+      {/* Назва гри зверху */}
+      <h1 className="text-4xl font-bold mb-6">{game.title}</h1>
+
+      {/* Основна секція: фотографії та інформація про гру */}
+      <div className="grid grid-cols-1 lg-grid-cols-3 gap-6 mb-8 items-start">
+        {/* Ліва частина: горизонтальний скролл фотографій */}
+        <div className="lg-col-span-2">
+          <div className="screenshots-scroll overflow-x-auto" style={{ height: '500px' }}>
+            <div className="flex gap-4" style={{ height: '100%' }}>
+              {allImages.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={index === 0 ? game.title : `Screenshot ${index}`}
+                  className="h-full object-cover rounded-lg flex-shrink-0"
+                  style={{ minWidth: '800px' }}
+                />
+              ))}
             </div>
-          )}
+          </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left: Image */}
-            <div>
-              <img
-                src={game.coverImage}
-                alt={game.title}
-                className="w-full rounded-lg shadow-2xl"
-              />
-              
-              {/* Screenshots */}
-              {game.screenshots && game.screenshots.length > 0 && (
-                <div className="mt-4 grid grid-cols-3 gap-2">
-                  {game.screenshots.map((screenshot, index) => (
-                    <img
-                      key={index}
-                      src={screenshot}
-                      alt={`Screenshot ${index + 1}`}
-                      className="w-full h-20 object-cover rounded cursor-pointer hover:opacity-75 transition"
-                    />
-                  ))}
-                </div>
-              )}
+        {/* Права частина: інформація про гру */}
+        <div className="lg-col-span-1 lg-top-8">
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4">About game</h2>
+            
+            {/* Теги та жанр */}
+            <div className="mb-4">
+              <span className="inline-block bg-blue-600 text-white px-3 py-1 rounded-full text-sm mr-2 mb-2">
+                {game.genre}
+              </span>
+              <span className="inline-block bg-gray-600 text-white px-3 py-1 rounded-full text-sm mr-2 mb-2">
+                {game.ageRating}
+              </span>
             </div>
 
-            {/* Right: Info */}
-            <div>
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h1 className="text-4xl font-bold mb-2">{game.title}</h1>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="bg-blue-600 px-3 py-1 rounded-full">
-                      {game.genre}
-                    </span>
-                    <span>{game.ageRating}</span>
-                  </div>
-                </div>
-                
-                <button
-                  onClick={handleToggleWishlist}
-                  disabled={wishlistLoading}
-                  className="btn btn-danger btn-glow"
-                  title={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
-                >
-                  <Heart
-                    className={`w-8 h-8 ${
-                      isInWishlist ? 'fill-red-500 text-red-500' : 'text-white'
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {/* Rating */}
-              <div className="flex items-center gap-2 mb-4">
+            {/* Рейтинг */}
+            <div className="mb-4">
+              <div className="flex gap-2 mb-2">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
@@ -219,164 +251,171 @@ const GameDetailPage: React.FC = () => {
                       className={`w-5 h-5 ${
                         star <= Math.round(game.rating)
                           ? 'text-yellow-400 fill-yellow-400'
-                          : 'text-gray-500'
+                          : 'text-gray-300'
                       }`}
                     />
                   ))}
                 </div>
-                <span className="text-lg">
-                  {game.rating.toFixed(1)} ({reviews.length} reviews)
+                <span className="text-lg text-gray-800">
+                  {game.rating} ({reviews.length} reviews)
                 </span>
               </div>
+            </div>
 
-              {/* Developer & Publisher */}
-              <div className="mb-4 space-y-1 text-gray-300">
-                <p>
-                  <span className="font-semibold">Developer:</span> {game.developer}
-                </p>
-                <p>
-                  <span className="font-semibold">Publisher:</span> {game.publisher}
-                </p>
+            {/* Developer & Publisher */}
+            <div className="mb-4 space-y-2 text-sm">
+              <p className="text-gray-800">
+                <span className="font-semibold text-gray-600">Developer:</span>{' '}
+                {game.developer}
+              </p>
+              <p className="text-gray-800">
+                <span className="font-semibold text-gray-600">Publisher:</span>{' '}
+                {game.publisher}
+              </p>
+            </div>
+
+            {/* Release Date */}
+            <div className="mb-4 text-sm">
+              <div className="flex gap-2">
+                <Calendar className="w-4 h-4 text-gray-600" />
+                <span className="text-gray-800">Released: {releaseDate}</span>
               </div>
+            </div>
 
-              {/* Release Date */}
-              <div className="flex items-center gap-2 mb-4 text-gray-300">
-                <Calendar className="w-5 h-5" />
-                <span>Released: {releaseDate}</span>
-              </div>
-
-              {/* Download Size */}
-              <div className="flex items-center gap-2 mb-6 text-gray-300">
-                <Download className="w-5 h-5" />
-                <span>Size: {(Number(game.downloadSize) / 1_000_000_000).toFixed(2)} GB</span>
-              </div>
-
-              {/* Price */}
-              <div className="mb-6">
-                {game.discountPrice ? (
-                  <div className="flex items-center gap-4">
-                    <span className="bg-red-600 px-3 py-1 rounded text-xl font-bold">
-                      -{discountPercentage}%
-                    </span>
-                    <div>
-                      <div className="text-gray-400 line-through text-lg">
-                        ${game.price}
-                      </div>
-                      <div className="text-4xl font-bold text-green-400">
-                        ${finalPrice}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-4xl font-bold">${finalPrice}</div>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-3">
-                <button
-                  onClick={handleAddToCart}
-                  disabled={isInCart(game.id)}
-                  className={`flex-1 py-4 px-6 rounded-lg text-lg font-semibold transition duration-200 ${
-                    isInCart(game.id)
-                      ? 'btn btn-disabled'
-                      : 'btn btn-success btn-glow bg-green-600'
-                  }`}
-                >
-                  {isInCart(game.id) ? 'Already in Cart' : 'Add to Cart'}
-                </button>
-
-                {isInCart(game.id) && (
-                  <button
-                    onClick={() => navigate('/cart')}
-                    className="btn btn-primary"
-                  >
-                    Go to Cart
-                  </button>
-                )}
+            {/* Download Size */}
+            <div className="mb-4 text-sm">
+              <div className="flex gap-2">
+                <Download className="w-4 h-4 text-gray-600" />
+                <span className="text-gray-800">
+                  Size: {(Number(game.downloadSize) / 1_000_000_000).toFixed(2)} GB
+                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Content Sections */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Description */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-bold mb-4">About This Game</h2>
-              <p className="text-gray-700 leading-relaxed">{game.description}</p>
-            </div>
-
-            {/* System Requirements */}
-            {game.systemRequirements && (
-              <SystemRequirements requirements={game.systemRequirements} />
-            )}
-
-            {/* Reviews Section */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-bold mb-6">Reviews</h2>
+      {/* Кнопки та вартість під фотографіями */}
+      <div className="mb-8" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          {isGameOwned(game.id) ? (
+            <button
+              disabled
+              style={{
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0.5rem',
+                fontSize: '1.125rem',
+                fontWeight: 600,
+                backgroundColor: '#4b5563',
+                color: '#9ca3af',
+                cursor: 'not-allowed',
+                border: 'none'
+              }}
+            >
+              In Cart
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={handleAddToCart}
+                disabled={isInCart(game.id)}
+                className='w-full btn-glow btn-success bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 px-6 rounded-xl text-lg font-bold hover:from-green-700 hover:to-emerald-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
+              >
+                {isInCart(game.id) ? 'In Cart' : 'Add to Cart'}
+              </button>
               
-              {isAuthenticated && (
-                <div className="mb-8">
-                  <ReviewForm gameId={game.id} onReviewSubmitted={handleReviewSubmitted} />
-                </div>
-              )}
-              
-              <ReviewsList reviews={reviews} onReviewDeleted={handleReviewSubmitted} />
-            </div>
-          </div>
+              <button
+                onClick={handleToggleWishlist}
+                disabled={isInWishlist || isGameOwned(game.id)}
+                className='w-full bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 transition duration-200 font-semibold flex gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
+              >
+                <Heart
+                  className='w-5 h-5'
+                />
+              </button>
+            </>
+          )}
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Info */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-bold mb-4">Game Info</h3>
-              <div className="space-y-3 text-sm">
-                <div>
-                  <span className="font-semibold text-gray-600">Genre:</span>
-                  <p className="text-gray-800">{game.genre}</p>
+          {isInCart(game.id) && !isGameOwned(game.id) && (
+            <button
+              onClick={() => navigate('/cart')}
+              className='w-full btn-primary bg-gray-700 text-gray-200 py-3 px-6 rounded-xl font-semibold hover:bg-gray-600 transition duration-200'
+            >
+              Go to Cart
+            </button>
+          )}
+        </div>
+
+        {/* Вартість */}
+        <div>
+          {game.discountPrice ? (
+            <div className="flex items-center gap-4">
+              <span className="bg-red-600 text-white px-3 py-1 rounded text-lg font-bold">
+                -{discountPercentage}%
+              </span>
+              <div>
+                <div className="text-gray-400 line-through text-lg">
+                  ${game.price}
                 </div>
-                <div>
-                  <span className="font-semibold text-gray-600">Developer:</span>
-                  <p className="text-gray-800">{game.developer}</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-600">Publisher:</span>
-                  <p className="text-gray-800">{game.publisher}</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-600">Release Date:</span>
-                  <p className="text-gray-800">{releaseDate}</p>
-                </div>
-                <div>
-                  <span className="font-semibold text-gray-600">Age Rating:</span>
-                  <p className="text-gray-800">{game.ageRating}</p>
+                <div className="text-3xl font-bold text-green-600">
+                  ${finalPrice}
                 </div>
               </div>
             </div>
+          ) : (
+            <div className="text-3xl font-bold">${finalPrice}</div>
+          )}
+        </div>
+      </div>
 
-            {/* Video Trailer */}
-            {game.videoTrailer && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-xl font-bold mb-4">Trailer</h3>
-                <div className="aspect-video bg-gray-200 rounded flex items-center justify-center">
-                  <a
-                    href={game.videoTrailer}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    Watch Trailer
-                  </a>
-                </div>
+      {/* Блок про гру (розтягнутий) */}
+      <div className="mb-8 p-6">
+        <h2 className="text-2xl font-bold mb-4">About This Game</h2>
+        <p className="text-gray-700 leading-relaxed text-lg">{game.description}</p>
+      </div>
+
+      {/* Системні вимоги: мінімальні зліва, рекомендовані справа */}
+      {game.systemRequirements && (
+        <div className="mb-8">
+          <div className="grid grid-cols-1 md-grid-cols-2 gap-6">
+            {/* Мінімальні вимоги */}
+            <div className="p-6">
+              <h3 className="text-xl font-bold mb-4">Minimum system requirements</h3>
+              <div className="space-y-2">
+                <SpecItem icon={Monitor} label="Operating system" value={game.systemRequirements.minOS} />
+                <SpecItem icon={Cpu} label="Processor" value={game.systemRequirements.minProcessor} />
+                <SpecItem icon={MemoryStick} label="RAM" value={game.systemRequirements.minRAM} />
+                <SpecItem icon={HardDrive} label="Storage" value={game.systemRequirements.minStorage} />
+                <SpecItem icon={CpuIcon} label="Gpu" value={game.systemRequirements.minGraphics} />
               </div>
-            )}
+            </div>
+
+            {/* Рекомендовані вимоги */}
+            <div className="p-6">
+              <h3 className="text-xl font-bold mb-4">Recommended system requirements</h3>
+              <div className="space-y-2">
+                <SpecItem icon={Monitor} label="Operating system" value={game.systemRequirements.recOS} />
+                <SpecItem icon={Cpu} label="Processor" value={game.systemRequirements.recProcessor} />
+                <SpecItem icon={MemoryStick} label="RAM" value={game.systemRequirements.recRAM} />
+                <SpecItem icon={HardDrive} label="Storage" value={game.systemRequirements.recStorage} />
+                <SpecItem icon={CpuIcon} label="Gpu" value={game.systemRequirements.recGraphics} />
+              </div>
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Блок переглядів */}
+      <div className="p-6">
+        <h2 className="text-2xl font-bold mb-6">Reviews</h2>
+        
+        {isAuthenticated && (
+          <div className="mb-8">
+            <ReviewForm gameId={game.id} onReviewSubmitted={handleReviewSubmitted} />
+          </div>
+        )}
+        
+        <ReviewsList reviews={reviews} onReviewDeleted={handleReviewSubmitted} />
       </div>
     </div>
   );

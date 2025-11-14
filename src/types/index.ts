@@ -45,6 +45,7 @@ export interface User {
   email: string;
   role: 'USER' | 'ADMIN'; // Для сумісності зі старою версією
   registrationDate?: string;
+  createdAt?: string;
   lastLoginAt?: string;
   accountStatus?: AccountStatus;
   balance?: number;
@@ -119,7 +120,7 @@ export interface CartItem {
 export interface Order {
   id: string;
   userId: string;
-  orderDate: string;
+  orderedAt: string;
   totalAmount: number;
   orderStatus: OrderStatus;
   paymentMethod: string;
@@ -159,8 +160,8 @@ export interface LibraryGame {
   libraryId: string;
   gameId: string;
   game: Game;
-  purchaseDate: string;
-  lastPlayedDate?: string;
+  purchasedAt: string;
+  lastPlayedAt?: string;
   playTime: number;
   isInstalled: boolean;
 }
@@ -176,6 +177,7 @@ export interface Review {
   reviewDate: string;
   helpfulCount: number;
   isVerifiedPurchase: boolean;
+  isLiked?: boolean;
 }
 
 // Promotion

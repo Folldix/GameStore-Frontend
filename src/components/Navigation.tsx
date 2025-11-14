@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart, Heart, Library, User, LogOut, Home } from 'lucide-react';
+import { ShoppingCart, Heart, Library, User, Home } from 'lucide-react';
 
 // ========= Стилізовані компоненти =========
 const StyledNav = styled.nav`
@@ -132,14 +132,14 @@ const LoginButton = styled(StyledButton)`
   color: white;
 `;
 
-const LogoutButton = styled(StyledButton)`
-  background: linear-gradient(to right, #e03131, #fa5252);
+const ProfileButton = styled(StyledButton)`
+  background: linear-gradient(to right, #2E9BFA, #5FF379);
   color: white;
 `;
 
 // ========= Основний компонент =========
 const Navigation: React.FC = () => {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { itemCount } = useCart();
 
   return (
@@ -188,10 +188,10 @@ const Navigation: React.FC = () => {
                     ADMIN
                   </AdminButton>
                 )}
-                <LogoutButton onClick={logout}>
-                  <LogOut size={20} />
-                  <span>LOGOUT</span>
-                </LogoutButton>
+                <ProfileButton as={Link} to="/profile">
+                  <User size={20} />
+                  <span>PROFILE</span>
+                </ProfileButton>
               </>
             ) : (
               <>

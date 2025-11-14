@@ -4,12 +4,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useLibrary } from '../context/LibraryContext';
 import { orderService } from '../services/api';
 import { Trash2 } from 'lucide-react';
 
 const CartPage: React.FC = () => {
   const { items, removeFromCart, clearCart, total } = useCart();
   const { isAuthenticated } = useAuth();
+  const { refreshLibrary } = useLibrary();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -32,6 +34,7 @@ const CartPage: React.FC = () => {
       await orderService.checkout(checkoutItems);
       
       clearCart();
+      await refreshLibrary(); // Оновити бібліотеку після покупки
       alert('Order placed successfully!');
       navigate('/profile');
     } catch (err) {
@@ -126,7 +129,7 @@ const CartPage: React.FC = () => {
               className="cart-item-card glass-card hover-lift p-4"
               style={{ borderRadius: '16px' }}
             >
-              <div className="flex flex-col h-full">
+              <div className=" h-full">
                 {/* Image */}
                 <div className="image-zoom mb-4" style={{ height: '200px', overflow: 'hidden', borderRadius: '12px' }}>
                   <img
@@ -152,7 +155,7 @@ const CartPage: React.FC = () => {
                 {/* Remove Button */}
                 <button
                   onClick={() => removeFromCart(item.game.id)}
-                  className="w-full text-center bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 transition duration-200 font-semibold flex items-center justify-center gap-2"
+                  className="w-full bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 transition duration-200 font-semibold flex gap-2"
                   style={{marginTop: 20 }}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -170,20 +173,20 @@ const CartPage: React.FC = () => {
             <h2 className="text-3xl font-bold mb-6 text-center gradient-text" style={{marginTop: 10}}>Order Summary</h2>
             
             <div className="space-y-2 mb-4" style={{marginLeft: 10}}>
-              <div className="flex justify-between text-gray-600">
+              <div className="flex justify-between text-gray-600" >
                 <span>Items ({items.length}) </span>
                 {items.map((v) => (
                   v.game.id == items[items.length - 1].game.id?
-                  <span>${v.game.price}</span>
+                  <span style={{marginRight: 10}}>${v.game.price}</span>
                   :
-                  <span>${v.game.price} + </span>
+                  <span style={{marginRight: 10}}>${v.game.price} + </span>
                 ))}
               </div>
               
               <div className="border-t pt-2 mt-2">
                 <div className="flex justify-between text-xl font-bold">
                   <span>Total</span>
-                  <span className="text-blue-600" style={{margin: 5}}>${total}</span>
+                  <span className="text-blue-600" style={{marginRight: 10}}>${total}</span>
                 </div>
               </div>
             </div>
@@ -193,6 +196,7 @@ const CartPage: React.FC = () => {
                 <button
                   onClick={handleCheckout}
                   disabled={loading}
+                  style={{marginRight: 10, marginLeft: 10}}
                   className="w-full btn-glow btn-success bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 px-6 rounded-xl text-lg font-bold hover:from-green-700 hover:to-emerald-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Processing...' : 'Proceed to Checkout'}

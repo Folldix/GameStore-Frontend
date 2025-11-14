@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { LibraryProvider } from './context/LibraryContext';
 import Navigation from './components/Navigation';
 import StorePage from './pages/StorePage';
 import GameDetailPage from './pages/GameDetail';
@@ -93,7 +94,9 @@ useEffect(() => {
     <Router>
       <AuthProvider>
         <CartProvider>
-          <AppContent />
+          <LibraryProvider>
+            <AppContent />
+          </LibraryProvider>
         </CartProvider>
       </AuthProvider>
     </Router>

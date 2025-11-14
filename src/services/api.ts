@@ -11,6 +11,7 @@ import {
   WishlistItem,
   ShoppingCart,
   CartItem,
+  User,
 } from '../types';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
@@ -62,6 +63,20 @@ export const authService = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Login failed');
+    }
+    
+    return response.json();
+  },
+
+  getCurrentUser: async (): Promise<User> => {
+    const response = await fetch(`${API_URL}/auth/me`, {
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch user');
     }
     
     return response.json();
@@ -141,6 +156,7 @@ export const gameService = {
 export const orderService = {
   getMyOrders: async (): Promise<Order[]> => {
     const response = await fetch(`${API_URL}/orders/my-orders`, {
+      headers: getAuthHeaders(),
       credentials: 'include',
     });
     
@@ -154,7 +170,7 @@ export const orderService = {
   checkout: async (items: { gameId: string }[]): Promise<Order> => {
     const response = await fetch(`${API_URL}/orders/checkout`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify({ items }),
     });
@@ -172,6 +188,7 @@ export const orderService = {
 export const cartService = {
   getCart: async (): Promise<ShoppingCart> => {
     const response = await fetch(`${API_URL}/cart`, {
+      headers: getAuthHeaders(),
       credentials: 'include',
     });
     
@@ -185,7 +202,7 @@ export const cartService = {
   addToCart: async (gameId: string): Promise<CartItem> => {
     const response = await fetch(`${API_URL}/cart/items`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify({ gameId }),
     });
@@ -201,6 +218,7 @@ export const cartService = {
   removeFromCart: async (itemId: string): Promise<void> => {
     const response = await fetch(`${API_URL}/cart/items/${itemId}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
       credentials: 'include',
     });
     
@@ -212,6 +230,7 @@ export const cartService = {
   clearCart: async (): Promise<void> => {
     const response = await fetch(`${API_URL}/cart`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
       credentials: 'include',
     });
     
@@ -225,6 +244,7 @@ export const cartService = {
 export const libraryService = {
   getLibrary: async (): Promise<Library> => {
     const response = await fetch(`${API_URL}/library`, {
+      headers: getAuthHeaders(),
       credentials: 'include',
     });
     
@@ -238,6 +258,7 @@ export const libraryService = {
   toggleInstall: async (gameId: string): Promise<LibraryGame> => {
     const response = await fetch(`${API_URL}/library/games/${gameId}/install`, {
       method: 'PATCH',
+      headers: getAuthHeaders(),
       credentials: 'include',
     });
     
@@ -251,7 +272,7 @@ export const libraryService = {
   updatePlayTime: async (gameId: string, playTime: number): Promise<LibraryGame> => {
     const response = await fetch(`${API_URL}/library/games/${gameId}/play`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify({ playTime }),
     });
@@ -281,7 +302,7 @@ export const reviewService = {
   createReview: async (data: CreateReviewRequest): Promise<Review> => {
     const response = await fetch(`${API_URL}/reviews`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify(data),
     });
@@ -300,7 +321,7 @@ export const reviewService = {
   ): Promise<Review> => {
     const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify(data),
     });
@@ -316,6 +337,7 @@ export const reviewService = {
   deleteReview: async (reviewId: string): Promise<void> => {
     const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
       credentials: 'include',
     });
     
@@ -327,6 +349,7 @@ export const reviewService = {
   markHelpful: async (reviewId: string): Promise<Review> => {
     const response = await fetch(`${API_URL}/reviews/${reviewId}/helpful`, {
       method: 'POST',
+      headers: getAuthHeaders(),
       credentials: 'include',
     });
     
@@ -342,6 +365,7 @@ export const reviewService = {
 export const wishlistService = {
   getWishlist: async (): Promise<WishlistItem[]> => {
     const response = await fetch(`${API_URL}/wishlist`, {
+      headers: getAuthHeaders(),
       credentials: 'include',
     });
     
@@ -355,7 +379,7 @@ export const wishlistService = {
   addToWishlist: async (gameId: string): Promise<WishlistItem> => {
     const response = await fetch(`${API_URL}/wishlist`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       credentials: 'include',
       body: JSON.stringify({ gameId }),
     });
@@ -371,6 +395,7 @@ export const wishlistService = {
   removeFromWishlist: async (gameId: string): Promise<void> => {
     const response = await fetch(`${API_URL}/wishlist/${gameId}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
       credentials: 'include',
     });
     

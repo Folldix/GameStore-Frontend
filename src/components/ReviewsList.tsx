@@ -1,6 +1,6 @@
 // frontend/src/components/ReviewsList.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Review } from '../types';
 import { Star, ThumbsUp, ShieldCheck, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -12,8 +12,26 @@ interface ReviewsListProps {
 }
 
 const ReviewsList: React.FC<ReviewsListProps> = ({ reviews, onReviewDeleted }) => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [likedReviews, setLikedReviews] = useState<Set<string>>(
+    new Set(reviews.filter(r => r.isLiked).map(r => r.id))
+  );
+  const [helpfulCounts, setHelpfulCounts] = useState<Record<string, number>>(
+    reviews.reduce((acc, r) => {
+      acc[r.id] = r.helpfulCount;
+      return acc;
+    }, {} as Record<string, number>)
+  );
+
+  // Update state when reviews change
+  useEffect(() => {
+    setLikedReviews(new Set(reviews.filter(r => r.isLiked).map(r => r.id)));
+    setHelpfulCounts(reviews.reduce((acc, r) => {
+      acc[r.id] = r.helpfulCount;
+      return acc;
+    }, {} as Record<string, number>));
+  }, [reviews]);
 
   const handleDelete = async (reviewId: string) => {
     if (!window.confirm('Are you sure you want to delete this review?')) {
@@ -31,12 +49,70 @@ const ReviewsList: React.FC<ReviewsListProps> = ({ reviews, onReviewDeleted }) =
     }
   };
 
-  const handleMarkHelpful = async (reviewId: string) => {
+  const handleToggleHelpful = async (reviewId: string) => {
+    if (!isAuthenticated) {
+      alert('Please login to like reviews');
+      return;
+    }
+
     try {
-      await reviewService.markHelpful(reviewId);
-      onReviewDeleted(); // Reload reviews
+      const wasLiked = likedReviews.has(reviewId);
+      const currentCount = helpfulCounts[reviewId] || 0;
+
+      // Optimistic update
+      setLikedReviews(prev => {
+        const newSet = new Set(prev);
+        if (wasLiked) {
+          newSet.delete(reviewId);
+        } else {
+          newSet.add(reviewId);
+        }
+        return newSet;
+      });
+
+      setHelpfulCounts(prev => ({
+        ...prev,
+        [reviewId]: wasLiked ? currentCount - 1 : currentCount + 1,
+      }));
+
+      const updatedReview = await reviewService.markHelpful(reviewId);
+      
+      // Update with actual data from server
+      setHelpfulCounts(prev => ({
+        ...prev,
+        [reviewId]: updatedReview.helpfulCount,
+      }));
+      
+      setLikedReviews(prev => {
+        const newSet = new Set(prev);
+        if (updatedReview.isLiked) {
+          newSet.add(reviewId);
+        } else {
+          newSet.delete(reviewId);
+        }
+        return newSet;
+      });
     } catch (err) {
-      console.error('Failed to mark as helpful');
+      // Revert optimistic update on error
+      const wasLiked = likedReviews.has(reviewId);
+      const currentCount = helpfulCounts[reviewId] || 0;
+      
+      setLikedReviews(prev => {
+        const newSet = new Set(prev);
+        if (!wasLiked) {
+          newSet.delete(reviewId);
+        } else {
+          newSet.add(reviewId);
+        }
+        return newSet;
+      });
+
+      setHelpfulCounts(prev => ({
+        ...prev,
+        [reviewId]: wasLiked ? currentCount + 1 : currentCount - 1,
+      }));
+
+      console.error('Failed to toggle helpful');
     }
   };
 
@@ -57,7 +133,7 @@ const ReviewsList: React.FC<ReviewsListProps> = ({ reviews, onReviewDeleted }) =
 
   if (reviews.length === 0) {
     return (
-      <div className="text-center py-8 bg-gray-50 rounded-lg">
+      <div className=" py-8 bg-gray-50 rounded-lg">
         <p className="text-gray-600">No reviews yet. Be the first to review this game!</p>
       </div>
     );
@@ -70,10 +146,10 @@ const ReviewsList: React.FC<ReviewsListProps> = ({ reviews, onReviewDeleted }) =
     <div>
       {/* Summary */}
       <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center gap-4">
-          <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600">
-              {avgRating.toFixed(1)}
+        <div className="flex gap-4">
+          <div className="">
+            <div className="text-4xl text-center font-bold text-blue-600">
+              {avgRating}
             </div>
             <div className="flex mt-1">
               {renderStars(Math.round(avgRating))}
@@ -99,12 +175,12 @@ const ReviewsList: React.FC<ReviewsListProps> = ({ reviews, onReviewDeleted }) =
           >
             <div className="flex justify-between items-start mb-3">
               <div>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex gap-2 mb-2">
                   <span className="font-semibold text-gray-800">
                     {review.user?.username || 'Anonymous'}
                   </span>
                   {review.isVerifiedPurchase && (
-                    <span className="flex items-center gap-1 text-green-600 text-sm">
+                    <span className="flex gap-1 text-green-600 text-sm">
                       <ShieldCheck className="w-4 h-4" />
                       Verified Purchase
                     </span>
@@ -121,7 +197,7 @@ const ReviewsList: React.FC<ReviewsListProps> = ({ reviews, onReviewDeleted }) =
                   <button
                     onClick={() => handleDelete(review.id)}
                     disabled={deletingId === review.id}
-                    className="mt-2 text-red-600 hover:text-red-700 text-sm flex items-center gap-1"
+                    className="mt-2 text-red-600 hover:text-red-700 text-sm flex  gap-1"
                   >
                     <Trash2 className="w-4 h-4" />
                     Delete
@@ -132,13 +208,21 @@ const ReviewsList: React.FC<ReviewsListProps> = ({ reviews, onReviewDeleted }) =
 
             <p className="text-gray-700 mb-3 leading-relaxed">{review.comment}</p>
 
-            <div className="flex items-center gap-4 text-sm text-gray-600">
+            <div className="flex gap-4 text-sm text-gray-600">
               <button
-                onClick={() => handleMarkHelpful(review.id)}
-                className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+                onClick={() => handleToggleHelpful(review.id)}
+                disabled={!isAuthenticated}
+                className={`flex items-center gap-1 transition-colors ${
+                  likedReviews.has(review.id)
+                    ? 'text-blue-600'
+                    : 'hover:text-blue-600'
+                } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                title={!isAuthenticated ? 'Login to like reviews' : likedReviews.has(review.id) ? 'Unlike' : 'Like'}
               >
-                <ThumbsUp className="w-4 h-4" />
-                Helpful ({review.helpfulCount})
+                <ThumbsUp 
+                  className={`w-4 h-4 ${likedReviews.has(review.id) ? 'fill-current' : ''}`}
+                />
+                Helpful ({helpfulCounts[review.id] || review.helpfulCount})
               </button>
             </div>
           </div>

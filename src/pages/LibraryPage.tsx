@@ -65,25 +65,33 @@ const LibraryPage: React.FC = () => {
       case 'date':
       default:
         return games.sort((a, b) => 
-          new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime()
+          new Date(b.purchasedAt).getTime() - new Date(a.purchasedAt).getTime()
         );
     }
   };
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center text-xl">Loading library...</div>
+      <div className="mx-auto px-4 py-8 page-transition" style={{ maxWidth: '1400px' }}>
+        <div className="text-center">
+          <div className="cyber-spinner"></div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="mx-auto px-4 py-8 page-transition" style={{ maxWidth: '1400px' }}>
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
+        <button
+          onClick={loadLibrary}
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Try Again
+        </button>
       </div>
     );
   }
@@ -91,21 +99,40 @@ const LibraryPage: React.FC = () => {
   const sortedGames = getSortedGames();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">My Library</h1>
-        <p className="text-gray-600">
+    <div className="mx-auto px-4 py-8 page-transition">
+      <style>{`
+        .games-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.5rem;
+        }
+        
+        @media (max-width: 1024px) {
+          .games-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        
+        @media (max-width: 768px) {
+          .games-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+      <div className="mb-8" style={{margin: 10}}>
+        <h1 className="text-3xl font-bold mb-4 gradient-text">My Library</h1>
+        <p className="text-gray-400">
           {sortedGames.length} {sortedGames.length === 1 ? 'game' : 'games'} in your library
         </p>
       </div>
 
       {/* Sort Controls */}
-      <div className="mb-6 flex items-center gap-4">
-        <label className="text-gray-700 font-semibold">Sort by:</label>
+      <div className="mb-6 flex items-center gap-4" style={{margin: 10}}>
+        <label className="text-white font-semibold">Sort by:</label>
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as any)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="date">Purchase Date</option>
           <option value="name">Name</option>
@@ -114,73 +141,88 @@ const LibraryPage: React.FC = () => {
       </div>
 
       {sortedGames.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-xl text-gray-600 mb-6">Your library is empty</p>
+        <div className="text-center py-12" style={{margin: 10}}>
+          <p className="text-xl text-gray-400 mb-6">Your library is empty</p>
           <button
             onClick={() => navigate('/')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200"
+            className="btn btn-primary"
           >
             Browse Games
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="games-grid" style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(3, 1fr)', 
+          gap: '1.5rem' 
+        }}>
           {sortedGames.map((libraryGame) => (
             <div
               key={libraryGame.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-200"
+              className="game-card-cyber glass-card hover-lift rounded-lg overflow-hidden"
+              style={{margin: 10}}
             >
-              <img
-                src={libraryGame.game.coverImage}
-                alt={libraryGame.game.title}
-                className="w-full h-48 object-cover"
-              />
+              <div className="image-zoom rounded-lg overflow-hidden" style={{ height: '280px', overflow: 'hidden' }}>
+                <img
+                  src={libraryGame.game.coverImage || libraryGame.game.coverImageUrl || '/placeholder-game.jpg'}
+                  alt={libraryGame.game.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover object-top"
+                  style={{ minHeight: '100%', minWidth: '100%' }}
+                />
+              </div>
               
-              <div className="p-4">
-                <h2 className="text-xl font-bold mb-2">{libraryGame.game.title}</h2>
+              <div className="p-5" style={{  margin: 20}}>
+                <h2 className="text-xl font-bold mb-2 truncate text-white" style={{  padding: 5}}>{libraryGame.game.title}</h2>
                 
-                <div className="space-y-2 mb-4 text-sm text-gray-600">
+                <div className="mb-3" style={{  padding: 5}}>
+                  <span className="genre-tag text-xs">
+                    {libraryGame.game.genre}
+                  </span>
+                </div>
+                
+                <div className="space-y-2 mb-4 text-sm text-gray-400" style={{  padding: 5}}>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4" />
                     <span>Play Time: {formatPlayTime(libraryGame.playTime)}</span>
                   </div>
                   
-                  {libraryGame.lastPlayedDate && (
+                  {libraryGame.lastPlayedAt && (
                     <div>
-                      Last played: {new Date(libraryGame.lastPlayedDate).toLocaleDateString()}
+                      Last played: {new Date(libraryGame.lastPlayedAt).toLocaleDateString()}
                     </div>
                   )}
                   
                   <div>
-                    Purchased: {new Date(libraryGame.purchaseDate).toLocaleDateString()}
+                    Purchased: {new Date(libraryGame.purchasedAt).toLocaleDateString()}
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2" style={{  padding: 5}}>
                   <button
                     onClick={() => navigate(`/game/${libraryGame.game.id}`)}
-                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200 flex items-center justify-center gap-2"
+                    className="flex-1 btn btn-primary"
                   >
-                    <Play className="w-4 h-4" />
+                    <Play className="w-4 h-4 inline mr-2" />
                     Details
                   </button>
                   
                   <button
                     onClick={() => handleToggleInstall(libraryGame.game.id)}
-                    className={`px-4 py-2 rounded-lg transition duration-200 flex items-center gap-2 ${
+                    className={`btn ${
                       libraryGame.isInstalled
-                        ? 'bg-red-600 text-white hover:bg-red-700'
-                        : 'bg-green-600 text-white hover:bg-green-700'
+                        ? 'btn-danger'
+                        : 'btn-success'
                     }`}
                   >
                     {libraryGame.isInstalled ? (
                       <>
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4 inline mr-2" />
                         Uninstall
                       </>
                     ) : (
                       <>
-                        <Download className="w-4 h-4" />
+                        <Download className="w-4 h-4 inline mr-2" />
                         Install
                       </>
                     )}

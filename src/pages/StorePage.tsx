@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { Game } from '../types';
 import { gameService } from '../services/api';
 import { useCart } from '../context/CartContext';
+import { useLibrary } from '../context/LibraryContext';
+import { useAuth } from '../context/AuthContext';
 import { Star, ShoppingCart } from 'lucide-react';
 
 const StorePage: React.FC = () => {
@@ -14,6 +16,8 @@ const StorePage: React.FC = () => {
   const [selectedGenre, setSelectedGenre] = useState<string>('');
   
   const { addToCart, isInCart } = useCart();
+  const { isGameOwned } = useLibrary();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     loadGames();
@@ -33,6 +37,10 @@ const StorePage: React.FC = () => {
   };
 
   const handleAddToCart = (game: Game) => {
+    if (isGameOwned(game.id)) {
+      alert('Ви вже маєте цю гру в бібліотеці!');
+      return;
+    }
     addToCart(game);
   };
 
@@ -165,7 +173,7 @@ const StorePage: React.FC = () => {
                 
                 {/* Rating (if available) */}
                 {game.rating && (
-                  <div className="flex items-center gap-2 mb-3" style={{  padding: 5}}>
+                  <div className="flex gap-2 mb-3" style={{  padding: 5}}>
                     <div className="flex">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
@@ -179,15 +187,15 @@ const StorePage: React.FC = () => {
                       ))}
                     </div>
                     <span className="text-sm text-gray-400">
-                      {game.rating.toFixed(1)}
+                      {game.rating}
                     </span>
                   </div>
                 )}
                 
                 {/* Price */}
-                <div className="flex items-center justify-between mb-4" style={{  padding: 5}}>
+                <div className="flex justify-between mb-4" style={{  padding: 5}}>
                   {game.discountPrice ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex gap-2">
                   <span className="text-2xl font-bold text-blue-600">                        
                         ${game.discountPrice}
                       </span>
@@ -210,14 +218,24 @@ const StorePage: React.FC = () => {
                     View Details
                   </Link>
                   
-                  <button
-                    onClick={() => handleAddToCart(game)}
-                    disabled={isInCart(game.id)}
-                    className={`btn ${isInCart(game.id) ? 'btn-disabled' : 'btn-success'}`}
-                    style={{  float: 'right', marginRight: 20, marginBottom: 20}}
-                  >
-                    {isInCart(game.id) ? 'In Cart' : 'Add'}
-                  </button>
+                  {isGameOwned(game.id) ? (
+                    <button
+                      disabled
+                      className="btn btn-disabled bg-gray-600 text-gray-400 cursor-not-allowed"
+                      style={{  float: 'right', marginRight: 20, marginBottom: 20}}
+                    >
+                      In Cart
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleAddToCart(game)}
+                      disabled={isInCart(game.id)}
+                      className={`btn ${isInCart(game.id) ? 'btn-disabled' : 'btn-success'}`}
+                      style={{  float: 'right', marginRight: 20, marginBottom: 20}}
+                    >
+                      {isInCart(game.id) ? 'In Cart' : 'Add'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
