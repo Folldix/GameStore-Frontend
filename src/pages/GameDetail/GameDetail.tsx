@@ -2,14 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Game, Review } from '../types';
-import { gameService, reviewService, wishlistService } from '../services/api';
-import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
-import { useLibrary } from '../context/LibraryContext';
+import { Game, Review } from '../../types';
+import { gameService, reviewService, wishlistService } from '../../services/api';
+import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
+import { useLibrary } from '../../context/LibraryContext';
 import { Heart, Star, Calendar, Download, Monitor, Cpu, HardDrive, MemoryStick, CpuIcon } from 'lucide-react';
-import ReviewsList from '../components/ReviewsList';
-import ReviewForm from '../components/ReviewForm';
+import ReviewsList from '../../components/ReviewsList';
+import ReviewForm from '../../components/ReviewForm';
 
 const GameDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -170,27 +170,6 @@ const GameDetailPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <style>{`
-        .screenshots-scroll {
-          scrollbar-width: thin;
-          scrollbar-color: rgba(0, 217, 255, 0.8) rgba(26, 31, 58, 0.5);
-        }
-        .screenshots-scroll::-webkit-scrollbar {
-          height: 12px;
-        }
-        .screenshots-scroll::-webkit-scrollbar-track {
-          background: rgba(26, 31, 58, 0.5);
-          border-radius: 6px;
-        }
-        .screenshots-scroll::-webkit-scrollbar-thumb {
-          background: linear-gradient(180deg, #2E9BFA, #5ff3f3);
-          border-radius: 6px;
-          border: 2px solid rgba(26, 31, 58, 0.5);
-        }
-        .screenshots-scroll::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(180deg, #00b8d9, #6a1fa8);
-        }
-      `}</style>
       <button
         onClick={() => navigate('/')}
         className="mb-6 text-blue-600 hover:text-blue-800"
@@ -212,7 +191,7 @@ const GameDetailPage: React.FC = () => {
         {/* Ліва частина: горизонтальний скролл фотографій */}
         <div className="lg-col-span-2">
           <div className="screenshots-scroll overflow-x-auto" style={{ height: '500px' }}>
-            <div className="flex gap-4" style={{ height: '100%' }}>
+            <div className="flex gap-4 h-full">
               {allImages.map((image, index) => (
                 <img
                   key={index}
@@ -303,14 +282,9 @@ const GameDetailPage: React.FC = () => {
               disabled
               style={{
                 padding: '0.75rem 1.5rem',
-                borderRadius: '0.5rem',
-                fontSize: '1.125rem',
-                fontWeight: 600,
-                backgroundColor: '#4b5563',
-                color: '#9ca3af',
                 cursor: 'not-allowed',
-                border: 'none'
               }}
+              className='.btn .btn:disabled font-semibold text-lg text-gray-300 rounded-lg'
             >
               In Cart
             </button>

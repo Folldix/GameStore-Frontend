@@ -7,11 +7,11 @@ import { CartProvider } from './context/CartContext';
 import { LibraryProvider } from './context/LibraryContext';
 import Navigation from './components/Navigation';
 import StorePage from './pages/StorePage';
-import GameDetailPage from './pages/GameDetail';
+import GameDetailPage from './pages/GameDetail/GameDetail';
 import CartPage from './pages/CartPage';
 import ProfilePage from './pages/ProfilePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
+import LoginPage from './pages/LoginRegPages/LoginPage';
+import RegisterPage from './pages/LoginRegPages/RegisterPage';
 import LibraryPage from './pages/LibraryPage';
 import WishlistPage from './pages/WishListPage';
 

@@ -131,7 +131,7 @@ const CartPage: React.FC = () => {
             >
               <div className=" h-full">
                 {/* Image */}
-                <div className="image-zoom mb-4" style={{ height: '200px', overflow: 'hidden', borderRadius: '12px' }}>
+                <div className="image-zoom mb-4 overflow-hidden" style={{ height: '200px', borderRadius: '12px' }}>
                   <img
                     src={item.game.coverImage || item.game.coverImageUrl}
                     alt={item.game.title}
