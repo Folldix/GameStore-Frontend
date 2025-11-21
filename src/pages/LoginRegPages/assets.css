@@ -10,6 +10,13 @@
     margin-bottom: 1.5rem;
 }
 
+.input-group-admin {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    position: relative;
+    margin-bottom: 0.5rem;
+}
+
 .input-icon {
     position: absolute;
     left: 1rem;

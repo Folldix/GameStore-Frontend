@@ -183,7 +183,7 @@ const Navigation: React.FC = () => {
           <ButtonsContainer>
             {isAuthenticated ? (
               <>
-                {user?.role === 'ADMIN' && (
+                {(user?.role === 'ADMIN' || user?.userType === 'ADMIN') && (
                   <AdminButton as={Link} to="/admin">
                     ADMIN
                   </AdminButton>

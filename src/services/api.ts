@@ -404,3 +404,56 @@ export const wishlistService = {
     }
   },
 };
+
+// Admin Service
+export const adminService = {
+  searchUsers: async (search?: string): Promise<User[]> => {
+    const url = search
+      ? `${API_URL}/auth/users?search=${encodeURIComponent(search)}`
+      : `${API_URL}/auth/users`;
+    
+    const response = await fetch(url, {
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to search users');
+    }
+    
+    return response.json();
+  },
+
+  updateUser: async (userId: string, data: Partial<User>): Promise<User> => {
+    const response = await fetch(`${API_URL}/auth/users/${userId}`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update user');
+    }
+    
+    return response.json();
+  },
+
+  banUser: async (email: string): Promise<User> => {
+    const response = await fetch(`${API_URL}/auth/users/ban`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+      body: JSON.stringify({ email }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to ban user');
+    }
+    
+    return response.json();
+  },
+};

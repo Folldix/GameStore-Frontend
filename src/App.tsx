@@ -14,6 +14,7 @@ import LoginPage from './pages/LoginRegPages/LoginPage';
 import RegisterPage from './pages/LoginRegPages/RegisterPage';
 import LibraryPage from './pages/LibraryPage';
 import WishlistPage from './pages/WishListPage';
+import AdminPanel from './pages/AdminPanel';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -28,6 +29,29 @@ const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }
   }
 
   return isAuthenticated ? children : <Navigate to="/login" />;
+};
+
+// Admin Route Component
+const AdminRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+  const { isAuthenticated, isAdmin, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/" />;
+  }
+
+  return children;
 };
 
 const AppContent: React.FC = () => {
@@ -62,6 +86,14 @@ const AppContent: React.FC = () => {
             <ProtectedRoute>
               <WishlistPage />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminPanel />
+            </AdminRoute>
           }
         />
         <Route path="*" element={<Navigate to="/" />} />

@@ -49,7 +49,7 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ marginTop: '45vh', display: 'flex', position: 'relative', zIndex: 10 }}>
+    <div className="min-h-screen flex justify-center px-4 py-8" style={{ display: 'flex', position: 'relative', zIndex: 10 }}>
 
       <div className="login-form-container glass-card p-8" style={{ borderRadius: '24px' }}>
         {/* Logo & Title */}
